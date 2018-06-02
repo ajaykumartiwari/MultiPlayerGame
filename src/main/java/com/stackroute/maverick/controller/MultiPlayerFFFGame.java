@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,13 +25,15 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.stackroute.maverick.domain.MatchingData;
+import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerGameResponseData;
 import com.stackroute.maverick.domain.MultiPlayerModel;
-import com.stackroute.maverick.domain.Questions;
+import com.stackroute.maverick.domain.MultipleQuestions;
 import com.stackroute.maverick.domain.Users;
 import com.stackroute.maverick.repository.UsersRepository;
 import com.stackroute.maverick.service.MultiPlayerAssessmentImpl;
 import com.stackroute.maverick.service.MultiPlayerModelService;
+import com.stackroute.maverick.service.UserService;
 
 @CrossOrigin(value = "*")
 @Controller
@@ -41,25 +41,38 @@ import com.stackroute.maverick.service.MultiPlayerModelService;
 public class MultiPlayerFFFGame {
 
 	int counter = 0;
+	int responses = 0;
 	MultiPlayerModel multiPlayerGameQuestion;
 	MatchingData matchingData;
-	List<Questions> quest;
-	List<Questions> question;
-	Questions q;
-	Users users;
+	List<MultipleQuestions> quest;
+	List<MultipleQuestions> question;
+	MultipleQuestions q;
+
+	//@Autowired
+	Users users=new Users();
+
 	int i = 0;
 	String message;
 
+	@Autowired
 	MultiPlayerGameResponseData responseData;
 
+	@Bean
+	public MultiPlayerGameResponseData responseData() {
+		return new MultiPlayerGameResponseData();
+	}
+
 	Set<Users> set = new HashSet<>();
-	String url = "http://172.23.239.205:8080/api/game/games/mp/869917";
+	String url = "http://172.23.238.185:8080/api/game/games/mp/869917";
 
 	@Autowired
 	private RestTemplate restTemplate;
 
 	@Autowired
 	MultiPlayerModelService multiPlayerModelService;
+
+	@Autowired
+	UserService userService;
 
 	@Autowired
 	private SimpMessageSendingOperations msgTemplate;
@@ -71,43 +84,51 @@ public class MultiPlayerFFFGame {
 	MultiPlayerAssessmentImpl multiPlayerAssessmentImpl;
 
 	@MessageMapping("/privateMessage")
-	@SendToUser("/topicResponse/reply")
+	@SendTo("/topicResponse/reply")
 	public String storeResponse(@Payload String message) throws Exception {
-
+        responses ++;
 		Gson data = new Gson();
 		MultiPlayerGameResponseData result;
 
+		System.out.println("Private topic" + message);
 		int userId = Integer.parseInt((data.fromJson(message, Map.class).get("userId").toString()));
 		int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
 		int qId = Integer.parseInt(data.fromJson(message, Map.class).get("questionId").toString());
-		responseData.setSelectedOption(data.fromJson(message, Map.class).get("selectedResponse").toString());
+		responseData.setSelectedOption(data.fromJson(message, Map.class).get("selectedOption").toString());
 		responseData.setQuestionStamp(data.fromJson(message, Map.class).get("questionStamp").toString());
 		responseData.setCorrectAns(data.fromJson(message, Map.class).get("correctAns").toString());
 
 		responseData.setEndTime(endTime);
 		responseData.setUserId(userId);
 		responseData.setQuestionId(qId);
-
+System.out.println(responses);
 		result = multiPlayerAssessmentImpl.MultiPlayerFastestFingerFirstAssessment(responseData);
+		if (result.equals(null)) {
+			
 
-		Users user = usersRepository.findByuserId(result.getUserId());
-		// int score = user.getScore();
-		user.setScore(user.getScore() + 5);
-		usersRepository.save(user);
-		
-		Iterable<Users> allUsers = usersRepository.findAll();
+			return null;
+		} else {
+			Users user = usersRepository.findByuserId(result.getUserId());
+			// int score = user.getScore();
+			user.setScore(user.getScore() + 5);
+			usersRepository.save(user);
 
-		/* Getting response from user */
-		String json = data.toJson(allUsers);
-		// users = new Users();
-		// users.setUserId(userId);
-		return json;
+			Iterable<Users> allUsers = usersRepository.findAll();
+             
+			/* Getting response from user */
+			String json = data.toJson(allUsers);
+			
+			// users = new Users();
+			// users.setUserId(userId);
+			return json;
+
+		}
 	}
 
 	@MessageMapping("/messageOpen")
 	@SendTo("/topicQuestion/reply")
 	// @Scheduled(fixedRate = 10000)
-	public Questions sendQuestionToAll(@Payload String message) throws Exception {
+	public MultipleQuestions sendQuestionToAll(@Payload String message) throws Exception {
 		counter++;
 		if (counter < 2) {
 			return null;
@@ -127,7 +148,7 @@ public class MultiPlayerFFFGame {
 	public void assessment() {
 		List<MultiPlayerGameResponseData> response = new ArrayList<>();
 		response.add(responseData);
-		q = new Questions();
+		q = new MultipleQuestions();
 
 		for (int i = 0; i < response.size(); i++) {
 			if (responseData.getSelectedOption() == question.iterator().next().correctAnswer) {
@@ -139,18 +160,30 @@ public class MultiPlayerFFFGame {
 		// return score;
 	}
 
+	
+	
+	@RequestMapping(value = "/users", method = RequestMethod.GET)
+	public ResponseEntity<Iterable<Users>> matchingAllUsers(Users users) {
+     System.out.println("Method hit");
+		Iterable<Users> user = userService.getAllUsers();
+		System.out.println();
+		return new ResponseEntity<>(user,HttpStatus.OK);
+
+	}
+	
 	@RequestMapping(value = "/users/{gameId}", method = RequestMethod.GET)
-	public List<Users> matchingUsers(@PathVariable("gameId") int gameId) {
+	public ResponseEntity<Users> matchingUsers(@PathVariable("gameId") int gameId) {
 
-		return null;
+		users = userService.findByGameId(gameId);
+		return new ResponseEntity<Users>(users, HttpStatus.OK);
 
 	}
 
-	@MessageExceptionHandler
-	public String handleException(Throwable exception) {
-		msgTemplate.convertAndSend("/errors", exception.getMessage());
-		return exception.getMessage();
-	}
+	// @MessageExceptionHandler
+	// public String handleException(Throwable exception) {
+	// msgTemplate.convertAndSend("/errors", exception.getMessage());
+	// return exception.getMessage();
+	// }
 
 	@RequestMapping(value = "/multiPlayer", method = RequestMethod.POST)
 	public ResponseEntity<MultiPlayerModel> create(@RequestBody MultiPlayerModel multiPlayerModel) {
@@ -168,7 +201,7 @@ public class MultiPlayerFFFGame {
 		return new ResponseEntity<MultiPlayerModel>(multiPlayerGameQuestion, HttpStatus.OK);
 	}
 
-	public List<Questions> sendQuestion() {
+	public List<MultipleQuestions> sendQuestion() {
 		Iterable<MultiPlayerModel> d = (Iterable<MultiPlayerModel>) multiPlayerModelService.getAllQuestions();
 		quest = d.iterator().next().getQuestions();
 		for (int i = 0; i < quest.size(); i++) {
@@ -178,14 +211,15 @@ public class MultiPlayerFFFGame {
 	}
 
 	@GetMapping("/getQuestionsFromGameManager")
-	public List<Questions> getQuestionsFromGameManager() {
+	public MultiPlayerGame getQuestionsFromGameManager() {
 
-		Iterable<MultiPlayerModel> d = restTemplate.getForObject(url, Iterable.class);
-		quest = d.iterator().next().getQuestions();
-		for (int i = 0; i < quest.size(); i++) {
-			System.out.println("Data is ====> :" + quest.get(i).questionStamp);
-		}
-		return null;
+		MultiPlayerGame d = restTemplate.getForObject(url, MultiPlayerGame.class);
+		System.out.println(d);
+//		quest = d.iterator().next().getQuestions();
+//		for (int i = 0; i < quest.size(); i++) {
+//			System.out.println("Data is ====> :" + quest.get(i).questionStamp);
+//		}
+		return d;
 	}
 
 }

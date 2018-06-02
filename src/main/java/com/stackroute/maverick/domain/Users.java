@@ -10,14 +10,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author ajay
  *
  */
+
 @Document(collection = "users")
 public class Users {
-    private int gameId;
-    @Id
+
+	@Id
 	private int userId;
+	private int gameId;
 	private int score;
-	
-	
 
 	public int getGameId() {
 		return gameId;

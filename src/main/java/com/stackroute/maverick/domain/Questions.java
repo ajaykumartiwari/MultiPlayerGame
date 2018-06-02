@@ -2,122 +2,76 @@ package com.stackroute.maverick.domain;
 
 import java.util.List;
 
-/**
- * @author ajay
- *
- */
-
 public class Questions {
-
-	public int questionId;
-	public String questionStamp;
-	public String op1;
-	public String op2;
-	public String op3;
-	public String op4;
-	public String correctAnswer;
-	public int questionTime;
-	private int questionScore;
-	private List<Users> users;
-
-	public Questions() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
+	private int questionId;
+    private int questionLevel;
+    private String questionStem;
+    private String questionType;
+    private String option1;
+    private String option2;
+    private String option3;
+    private String option4;
+    private String correctAnswer;
+    private List<AdminUser> user;
 	public int getQuestionId() {
 		return questionId;
 	}
-
 	public void setQuestionId(int questionId) {
 		this.questionId = questionId;
 	}
-
-	public String getQuestionStamp() {
-		return questionStamp;
+	public int getQuestionLevel() {
+		return questionLevel;
 	}
-
-	public void setQuestionStamp(String questionStamp) {
-		this.questionStamp = questionStamp;
+	public void setQuestionLevel(int questionLevel) {
+		this.questionLevel = questionLevel;
 	}
-
-	public String getOp1() {
-		return op1;
+	public String getQuestionStem() {
+		return questionStem;
 	}
-
-	public void setOp1(String op1) {
-		this.op1 = op1;
+	public void setQuestionStem(String questionStem) {
+		this.questionStem = questionStem;
 	}
-
-	public String getOp2() {
-		return op2;
+	public String getQuestionType() {
+		return questionType;
 	}
-
-	public void setOp2(String op2) {
-		this.op2 = op2;
+	public void setQuestionType(String questionType) {
+		this.questionType = questionType;
 	}
-
-	public String getOp3() {
-		return op3;
+	public String getOption1() {
+		return option1;
 	}
-
-	public void setOp3(String op3) {
-		this.op3 = op3;
+	public void setOption1(String option1) {
+		this.option1 = option1;
 	}
-
-	public String getOp4() {
-		return op4;
+	public String getOption2() {
+		return option2;
 	}
-
-	public void setOp4(String op4) {
-		this.op4 = op4;
+	public void setOption2(String option2) {
+		this.option2 = option2;
 	}
-
+	public String getOption3() {
+		return option3;
+	}
+	public void setOption3(String option3) {
+		this.option3 = option3;
+	}
+	public String getOption4() {
+		return option4;
+	}
+	public void setOption4(String option4) {
+		this.option4 = option4;
+	}
 	public String getCorrectAnswer() {
 		return correctAnswer;
 	}
-
 	public void setCorrectAnswer(String correctAnswer) {
 		this.correctAnswer = correctAnswer;
 	}
-
-	public int getQuestionTime() {
-		return questionTime;
+	public List<AdminUser> getUser() {
+		return user;
 	}
-
-	public void setQuestionTime(int questionTime) {
-		this.questionTime = questionTime;
+	public void setUser(List<AdminUser> user) {
+		this.user = user;
 	}
-
-	public int getQuestionScore() {
-		return questionScore;
-	}
-
-	public void setQuestionScore(int questionScore) {
-		this.questionScore = questionScore;
-	}
-
-	public List<Users> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<Users> users) {
-		this.users = users;
-	}
-
-	public Questions(int questionId, String questionStamp, String op1, String op2, String op3, String op4,
-			String correctAnswer, int questionTime, int questionScore, List<Users> users) {
-		super();
-		this.questionId = questionId;
-		this.questionStamp = questionStamp;
-		this.op1 = op1;
-		this.op2 = op2;
-		this.op3 = op3;
-		this.op4 = op4;
-		this.correctAnswer = correctAnswer;
-		this.questionTime = questionTime;
-		this.questionScore = questionScore;
-		this.users = users;
-	}
-
+    
 }

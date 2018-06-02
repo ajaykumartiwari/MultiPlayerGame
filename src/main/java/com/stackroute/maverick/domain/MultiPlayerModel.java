@@ -18,9 +18,9 @@ public class MultiPlayerModel {
 	private int gameSessionId;
 	public int noOfQuestions;
 	
-	private List<Questions> questions;
+	private List<MultipleQuestions> questions;
 
-	public MultiPlayerModel(int gameId, int gameSessionId, List<Questions> questions) {
+	public MultiPlayerModel(int gameId, int gameSessionId, List<MultipleQuestions> questions) {
 		super();
 		this.gameId = gameId;
 		this.gameSessionId = gameSessionId;
@@ -43,11 +43,11 @@ public class MultiPlayerModel {
 		this.gameSessionId = gameSessionId;
 	}
 
-	public List<Questions> getQuestions() {
+	public List<MultipleQuestions> getQuestions() {
 		return questions;
 	}
 
-	public void setQuestions(List<Questions> questions) {
+	public void setQuestions(List<MultipleQuestions> questions) {
 		this.questions = questions;
 	}
 

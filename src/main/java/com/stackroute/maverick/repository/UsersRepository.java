@@ -9,5 +9,7 @@ public interface UsersRepository extends CrudRepository<Users, Integer> {
 	
 	
 	public Users findByuserId(int userId);
+	public Users findByGameId(int gameId);
+	
 
 }
