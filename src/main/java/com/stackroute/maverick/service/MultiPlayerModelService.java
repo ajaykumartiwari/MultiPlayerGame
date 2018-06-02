@@ -1,5 +1,6 @@
 package com.stackroute.maverick.service;
 
+import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerModel;
 
 public interface MultiPlayerModelService {
@@ -10,7 +11,7 @@ public interface MultiPlayerModelService {
 	
 	public  MultiPlayerModel findByGameId(int gameId);
 	
-	public MultiPlayerModel create(MultiPlayerModel multiPlayerModel);
+	public MultiPlayerModel create(MultiPlayerGame  multiPlayerGame);
 	public Iterable<MultiPlayerModel> getAllQuestions();
 	MultiPlayerModel update(MultiPlayerModel updateMultiPlayer);
 }

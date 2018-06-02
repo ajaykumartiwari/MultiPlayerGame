@@ -2,7 +2,6 @@ package com.stackroute.maverick.controller;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
@@ -30,12 +28,12 @@ import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerGameResponseData;
 import com.stackroute.maverick.domain.MultiPlayerModel;
 import com.stackroute.maverick.domain.MultipleQuestions;
-import com.stackroute.maverick.domain.Questions;
 import com.stackroute.maverick.domain.Users;
 import com.stackroute.maverick.repository.MultiPlayerModelRepository;
 import com.stackroute.maverick.repository.UsersRepository;
 import com.stackroute.maverick.service.MultiPlayerAssessmentImpl;
 import com.stackroute.maverick.service.MultiPlayerModelService;
+import com.stackroute.maverick.service.MultiPlayerModelServiceImpl;
 import com.stackroute.maverick.service.UserService;
 
 @CrossOrigin(value = "*")
@@ -99,7 +97,8 @@ public class MultiPlayerFFFGame {
 
 	@Autowired
 	MultiPlayerModelRepository multiPlayerModelRepository;
-
+     
+	
 	@Bean
 	public MultipleQuestions multipleQuestions() {
 		return new MultipleQuestions();
@@ -204,11 +203,11 @@ public class MultiPlayerFFFGame {
 	// return exception.getMessage();
 	// }
 
-	@RequestMapping(value = "/multiPlayer", method = RequestMethod.POST)
-	public ResponseEntity<MultiPlayerModel> create(@RequestBody MultiPlayerModel multiPlayerModel) {
-		MultiPlayerModel multiPlayer = multiPlayerModelService.create(multiPlayerModel);
-		return new ResponseEntity<MultiPlayerModel>(multiPlayer, HttpStatus.OK);
-	}
+//	@RequestMapping(value = "/multiPlayer", method = RequestMethod.POST)
+//	public ResponseEntity<MultiPlayerModel> create(@RequestBody MultiPlayerModel multiPlayerModel) {
+//		MultiPlayerModel multiPlayer = multiPlayerModelService.create(multiPlayerModel);
+//		return new ResponseEntity<MultiPlayerModel>(multiPlayer, HttpStatus.OK);
+//	}
 
 	@RequestMapping(value = "/questions/{gameId}", method = RequestMethod.GET)
 	public ResponseEntity<MultiPlayerModel> findByGameId(@PathVariable("gameId") int gameId) throws Exception {
@@ -257,24 +256,26 @@ public class MultiPlayerFFFGame {
 //			multiPlayerModel.setQuestions(questions);
 //
 //		}
-		multiPlayerModel.setGameId(d.getGameId());
-		for (int i = 0; i < d.getAutoquestions().size(); i++) {
-			
-			multipleQuestions.setCorrectAnswer(d.getAutoquestions().get(i).getCorrectAnswer());
-			multipleQuestions.setOp1(d.getAutoquestions().get(i).getOption1());
-			multipleQuestions.setOp2(d.getAutoquestions().get(i).getOption2());
-            multipleQuestions.setOp3(d.getAutoquestions().get(i).getOption3());
-			multipleQuestions.setOp4(d.getAutoquestions().get(i).getOption4());
-			multipleQuestions.setQuestionId(d.getAutoquestions().get(i).getQuestionId());
-			multipleQuestions.setQuestionStamp(d.getAutoquestions().get(i).getQuestionStem());
-			questions.add(multipleQuestions);
-			multiPlayerModel.setQuestions(questions);
-
-		}
-
-		multiPlayerModel.setGameSessionId(multiPlayerModel.getGameSessionId());
-
-		multiPlayerModelRepository.save(multiPlayerModel);
+//		multiPlayerModel.setGameId(d.getGameId());
+//		for (int i = 0; i < d.getAutoquestions().size(); i++) {
+//			
+//			multipleQuestions.setCorrectAnswer(d.getAutoquestions().get(i).getCorrectAnswer());
+//			multipleQuestions.setOp1(d.getAutoquestions().get(i).getOption1());
+//			multipleQuestions.setOp2(d.getAutoquestions().get(i).getOption2());
+//            multipleQuestions.setOp3(d.getAutoquestions().get(i).getOption3());
+//			multipleQuestions.setOp4(d.getAutoquestions().get(i).getOption4());
+//			multipleQuestions.setQuestionId(d.getAutoquestions().get(i).getQuestionId());
+//			multipleQuestions.setQuestionStamp(d.getAutoquestions().get(i).getQuestionStem());
+//			questions.add(multipleQuestions);
+//			multiPlayerModel.setQuestions(questions);
+//
+//		}
+//
+//		multiPlayerModel.setGameSessionId(multiPlayerModel.getGameSessionId());
+//
+//		multiPlayerModelRepository.save(multiPlayerModel);
+		
+		multiPlayerModelService.create(d);
 		System.out.println("Save");
 
 		// Iterable<MultiPlayerModel> list = (Iterable<MultiPlayerModel>)
