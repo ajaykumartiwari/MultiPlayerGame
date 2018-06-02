@@ -1,6 +1,7 @@
 package com.stackroute.maverick.domain;
 
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,8 +17,6 @@ public class MultiPlayerModel {
 	@Id
 	private int gameId;
 	private int gameSessionId;
-	public int noOfQuestions;
-	
 	private List<MultipleQuestions> questions;
 
 	public MultiPlayerModel(int gameId, int gameSessionId, List<MultipleQuestions> questions) {
@@ -36,7 +35,10 @@ public class MultiPlayerModel {
 	}
 
 	public int getGameSessionId() {
-		return gameSessionId;
+		int i = 0;
+       Random rand = new Random();
+		i = rand.nextInt(50) + 1;
+		return i;
 	}
 
 	public void setGameSessionId(int gameSessionId) {
@@ -55,5 +57,5 @@ public class MultiPlayerModel {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
 }

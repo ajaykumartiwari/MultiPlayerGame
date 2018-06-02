@@ -2,6 +2,7 @@ package com.stackroute.maverick.controller;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +30,9 @@ import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerGameResponseData;
 import com.stackroute.maverick.domain.MultiPlayerModel;
 import com.stackroute.maverick.domain.MultipleQuestions;
+import com.stackroute.maverick.domain.Questions;
 import com.stackroute.maverick.domain.Users;
+import com.stackroute.maverick.repository.MultiPlayerModelRepository;
 import com.stackroute.maverick.repository.UsersRepository;
 import com.stackroute.maverick.service.MultiPlayerAssessmentImpl;
 import com.stackroute.maverick.service.MultiPlayerModelService;
@@ -48,8 +51,8 @@ public class MultiPlayerFFFGame {
 	List<MultipleQuestions> question;
 	MultipleQuestions q;
 
-	//@Autowired
-	Users users=new Users();
+	// @Autowired
+	Users users = new Users();
 
 	int i = 0;
 	String message;
@@ -62,8 +65,16 @@ public class MultiPlayerFFFGame {
 		return new MultiPlayerGameResponseData();
 	}
 
+	@Bean
+	public MultiPlayerModel multiPlayerModel() {
+		return new MultiPlayerModel();
+	}
+
+	@Autowired
+	MultiPlayerModel multiPlayerModel;
+
 	Set<Users> set = new HashSet<>();
-	String url = "http://172.23.238.185:8080/api/game/games/mp/869917";
+	String url = "http://172.23.239.205:8080/api/game/games/mp/348896";
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -83,10 +94,21 @@ public class MultiPlayerFFFGame {
 	@Autowired
 	MultiPlayerAssessmentImpl multiPlayerAssessmentImpl;
 
+	@Autowired
+	MultipleQuestions multipleQuestions;
+
+	@Autowired
+	MultiPlayerModelRepository multiPlayerModelRepository;
+
+	@Bean
+	public MultipleQuestions multipleQuestions() {
+		return new MultipleQuestions();
+	}
+
 	@MessageMapping("/privateMessage")
 	@SendTo("/topicResponse/reply")
 	public String storeResponse(@Payload String message) throws Exception {
-        responses ++;
+		responses++;
 		Gson data = new Gson();
 		MultiPlayerGameResponseData result;
 
@@ -101,10 +123,9 @@ public class MultiPlayerFFFGame {
 		responseData.setEndTime(endTime);
 		responseData.setUserId(userId);
 		responseData.setQuestionId(qId);
-System.out.println(responses);
+		System.out.println(responses);
 		result = multiPlayerAssessmentImpl.MultiPlayerFastestFingerFirstAssessment(responseData);
 		if (result.equals(null)) {
-			
 
 			return null;
 		} else {
@@ -114,10 +135,10 @@ System.out.println(responses);
 			usersRepository.save(user);
 
 			Iterable<Users> allUsers = usersRepository.findAll();
-             
+
 			/* Getting response from user */
 			String json = data.toJson(allUsers);
-			
+
 			// users = new Users();
 			// users.setUserId(userId);
 			return json;
@@ -160,17 +181,15 @@ System.out.println(responses);
 		// return score;
 	}
 
-	
-	
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	public ResponseEntity<Iterable<Users>> matchingAllUsers(Users users) {
-     System.out.println("Method hit");
+		System.out.println("Method hit");
 		Iterable<Users> user = userService.getAllUsers();
 		System.out.println();
-		return new ResponseEntity<>(user,HttpStatus.OK);
+		return new ResponseEntity<>(user, HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/users/{gameId}", method = RequestMethod.GET)
 	public ResponseEntity<Users> matchingUsers(@PathVariable("gameId") int gameId) {
 
@@ -212,13 +231,61 @@ System.out.println(responses);
 
 	@GetMapping("/getQuestionsFromGameManager")
 	public MultiPlayerGame getQuestionsFromGameManager() {
-
+		System.out.println("Method hit");
 		MultiPlayerGame d = restTemplate.getForObject(url, MultiPlayerGame.class);
-		System.out.println(d);
-//		quest = d.iterator().next().getQuestions();
-//		for (int i = 0; i < quest.size(); i++) {
-//			System.out.println("Data is ====> :" + quest.get(i).questionStamp);
+//		System.out.println(d.getAutoquestions().get(3).getOption3());
+		
+		List<MultipleQuestions> questions = new ArrayList<MultipleQuestions>();
+//		Iterator<Questions> itr = d.getAutoquestions().iterator();
+//		int counter = 0;
+
+		// Setting questions
+
+//		while (itr.hasNext()) {
+//			counter++;
+//			System.out.println(counter);
+//
+//			multipleQuestions.setCorrectAnswer(itr.next().getCorrectAnswer());
+//			multipleQuestions.setOp1((itr.next().getOption1()));
+//			multipleQuestions.setOp2((itr.next().getOption2()));
+//			System.out.println(itr.next().getOption3());
+//			multipleQuestions.setOp3((itr.next().getOption3()));
+//			multipleQuestions.setOp4((itr.next().getOption4()));
+//			multipleQuestions.setQuestionId(itr.next().getQuestionId());
+//			multipleQuestions.setQuestionStamp(itr.next().getQuestionStem());
+//			questions.add(multipleQuestions);
+//			multiPlayerModel.setQuestions(questions);
+//
 //		}
+		multiPlayerModel.setGameId(d.getGameId());
+		for (int i = 0; i < d.getAutoquestions().size(); i++) {
+			
+			multipleQuestions.setCorrectAnswer(d.getAutoquestions().get(i).getCorrectAnswer());
+			multipleQuestions.setOp1(d.getAutoquestions().get(i).getOption1());
+			multipleQuestions.setOp2(d.getAutoquestions().get(i).getOption2());
+            multipleQuestions.setOp3(d.getAutoquestions().get(i).getOption3());
+			multipleQuestions.setOp4(d.getAutoquestions().get(i).getOption4());
+			multipleQuestions.setQuestionId(d.getAutoquestions().get(i).getQuestionId());
+			multipleQuestions.setQuestionStamp(d.getAutoquestions().get(i).getQuestionStem());
+			questions.add(multipleQuestions);
+			multiPlayerModel.setQuestions(questions);
+
+		}
+
+		multiPlayerModel.setGameSessionId(multiPlayerModel.getGameSessionId());
+
+		multiPlayerModelRepository.save(multiPlayerModel);
+		System.out.println("Save");
+
+		// Iterable<MultiPlayerModel> list = (Iterable<MultiPlayerModel>)
+		// multiPlayerModelService.getAllQuestions();
+
+		// multipleQuestions.setCorrectAnswer(d.);
+
+		// quest = d.iterator().next().getQuestions();
+		// for (int i = 0; i < quest.size(); i++) {
+		// System.out.println("Data is ====> :" + quest.get(i).questionStamp);
+		// }
 		return d;
 	}
 

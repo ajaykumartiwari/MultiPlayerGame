@@ -18,7 +18,7 @@ public class MultipleQuestions {
 	public String correctAnswer;
 	public int questionTime;
 	private int questionScore;
-	private List<Users> users;
+//	private List<Users> users;
 
 	public MultipleQuestions() {
 		super();
@@ -97,16 +97,16 @@ public class MultipleQuestions {
 		this.questionScore = questionScore;
 	}
 
-	public List<Users> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<Users> users) {
-		this.users = users;
-	}
+//	public List<Users> getUsers() {
+//		return users;
+//	}
+//
+//	public void setUsers(List<Users> users) {
+//		this.users = users;
+//	}
 
 	public MultipleQuestions(int questionId, String questionStamp, String op1, String op2, String op3, String op4,
-			String correctAnswer, int questionTime, int questionScore, List<Users> users) {
+			String correctAnswer, int questionTime, int questionScore) {
 		super();
 		this.questionId = questionId;
 		this.questionStamp = questionStamp;
@@ -117,7 +117,7 @@ public class MultipleQuestions {
 		this.correctAnswer = correctAnswer;
 		this.questionTime = questionTime;
 		this.questionScore = questionScore;
-		this.users = users;
+		
 	}
 
 }
