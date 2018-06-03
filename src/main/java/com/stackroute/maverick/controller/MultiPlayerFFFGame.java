@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -236,7 +237,15 @@ public class MultiPlayerFFFGame {
 		MultiPlayerGame d = restTemplate.getForObject(url, MultiPlayerGame.class);
 		multiPlayerModelService.create(d);
 		System.out.println("Save");
-        return d;
+		return d;
+	}
+
+	@GetMapping("/getResults/{userId1}/{userId2}")
+	public Users getResult(@PathVariable("userId1") int userId1 , @PathVariable("userId2") int userId2) {
+		multiPlayerModelService.getResults(userId1, userId2);
+		System.out.println("Result method hit");
+		
+return null;
 	}
 
 }

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerModel;
 import com.stackroute.maverick.domain.MultipleQuestions;
+import com.stackroute.maverick.domain.Users;
 import com.stackroute.maverick.repository.MultiPlayerModelRepository;
+import com.stackroute.maverick.repository.UsersRepository;
 
 /**
  * @author ajay
@@ -31,6 +33,12 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 	MultipleQuestions multipleQuestions;
 
 	List<MultipleQuestions> questions;
+
+	@Autowired
+	UsersRepository usersRepository;
+
+	@Autowired
+	Users winningUser;
 
 	// @Override
 	// public Iterable<MultiPlayerModel> getAllQuestions() {
@@ -95,6 +103,26 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 		MultiPlayerModel updateModel = multiPlayerModelRepo.save(updateMultiPlayer);
 
 		return updateModel;
+	}
+
+	@Override
+	public Users getResults(int userId1, int userId2) {
+
+		Iterable<Users> users = usersRepository.findAll();
+		while (users.iterator().hasNext()) {
+			int score = users.iterator().next().getScore();
+			
+			if (winningUser.getScore() <= score) {
+				
+				winningUser.setGameId(users.iterator().next().getScore());
+				winningUser.setGameId(users.iterator().next().getGameId());
+				winningUser.setUserId(users.iterator().next().getUserId());
+
+			}
+		}
+		
+		return winningUser;
+
 	}
 
 }
