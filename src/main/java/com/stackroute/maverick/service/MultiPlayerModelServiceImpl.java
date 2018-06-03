@@ -27,8 +27,10 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 	@Autowired
 	MultiPlayerModel multiPlayerModel;
 
-	@Autowired
+	// @Autowired
 	MultipleQuestions multipleQuestions;
+
+	List<MultipleQuestions> questions;
 
 	// @Override
 	// public Iterable<MultiPlayerModel> getAllQuestions() {
@@ -54,12 +56,14 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 	public MultiPlayerModel create(MultiPlayerGame multiPlayerGame) {
 		// TODO Auto-generated method stub
 		// return multiPlayerModelRepo.save(multiPlayerModel);
+		questions = new ArrayList<>();
 
-		List<MultipleQuestions> questions = new ArrayList<MultipleQuestions>();
 		multiPlayerModel.setGameId(multiPlayerGame.getGameId());
+		multiPlayerModel.setGameSessionId(multiPlayerModel.getGameSessionId());
 		for (int i = 0; i < multiPlayerGame.getAutoquestions().size(); i++) {
-
+			multipleQuestions = new MultipleQuestions();
 			multipleQuestions.setCorrectAnswer(multiPlayerGame.getAutoquestions().get(i).getCorrectAnswer());
+			System.out.println(multiPlayerGame.getAutoquestions().get(i).getCorrectAnswer());
 			multipleQuestions.setOp1(multiPlayerGame.getAutoquestions().get(i).getOption1());
 			multipleQuestions.setOp2(multiPlayerGame.getAutoquestions().get(i).getOption2());
 			multipleQuestions.setOp3(multiPlayerGame.getAutoquestions().get(i).getOption3());
@@ -67,14 +71,15 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 			multipleQuestions.setQuestionId(multiPlayerGame.getAutoquestions().get(i).getQuestionId());
 			multipleQuestions.setQuestionStamp(multiPlayerGame.getAutoquestions().get(i).getQuestionStem());
 			questions.add(multipleQuestions);
-			multiPlayerModel.setQuestions(questions);
+			// System.out.println(i);
+			// System.out.println(questions.get(i).getCorrectAnswer());
+			// multiPlayerModel.setQuestions(questions);
 
 		}
-
-		multiPlayerModel.setGameSessionId(multiPlayerModel.getGameSessionId());
-		
+		multiPlayerModel.setGameName(multiPlayerGame.getGameName());
+		multiPlayerModel.setQuestions(questions);
 		multiPlayerModelRepo.save(multiPlayerModel);
-		
+		System.out.println("Saved in database");
 		return null;
 	}
 

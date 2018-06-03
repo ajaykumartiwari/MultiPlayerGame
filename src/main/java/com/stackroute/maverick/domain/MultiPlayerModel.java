@@ -17,7 +17,16 @@ public class MultiPlayerModel {
 	@Id
 	private int gameId;
 	private int gameSessionId;
+	private String gameName;
 	private List<MultipleQuestions> questions;
+
+	public String getGameName() {
+		return gameName;
+	}
+
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
+	}
 
 	public MultiPlayerModel(int gameId, int gameSessionId, List<MultipleQuestions> questions) {
 		super();
