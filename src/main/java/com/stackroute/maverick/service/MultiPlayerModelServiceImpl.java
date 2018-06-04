@@ -37,9 +37,6 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 	@Autowired
 	UsersRepository usersRepository;
 
-	@Autowired
-	Users winningUser;
-
 	// @Override
 	// public Iterable<MultiPlayerModel> getAllQuestions() {
 	// // TODO Auto-generated method stub
@@ -88,7 +85,7 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 		multiPlayerModel.setQuestions(questions);
 		multiPlayerModelRepo.save(multiPlayerModel);
 		System.out.println("Saved in database");
-		return null;
+		return multiPlayerModel;
 	}
 
 	@Override
@@ -103,26 +100,6 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 		MultiPlayerModel updateModel = multiPlayerModelRepo.save(updateMultiPlayer);
 
 		return updateModel;
-	}
-
-	@Override
-	public Users getResults(int userId1, int userId2) {
-
-		Iterable<Users> users = usersRepository.findAll();
-		while (users.iterator().hasNext()) {
-			int score = users.iterator().next().getScore();
-			
-			if (winningUser.getScore() <= score) {
-				
-				winningUser.setGameId(users.iterator().next().getScore());
-				winningUser.setGameId(users.iterator().next().getGameId());
-				winningUser.setUserId(users.iterator().next().getUserId());
-
-			}
-		}
-		
-		return winningUser;
-
 	}
 
 }

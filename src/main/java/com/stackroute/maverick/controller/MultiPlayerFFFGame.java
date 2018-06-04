@@ -24,30 +24,37 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
+import com.stackroute.maverick.domain.GameDetails;
 import com.stackroute.maverick.domain.MatchingData;
 import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerGameResponseData;
 import com.stackroute.maverick.domain.MultiPlayerModel;
 import com.stackroute.maverick.domain.MultipleQuestions;
+import com.stackroute.maverick.domain.ReportingData;
 import com.stackroute.maverick.domain.Users;
 import com.stackroute.maverick.repository.MultiPlayerModelRepository;
 import com.stackroute.maverick.repository.UsersRepository;
+import com.stackroute.maverick.service.KafkaProducer;
 import com.stackroute.maverick.service.MultiPlayerAssessmentImpl;
 import com.stackroute.maverick.service.MultiPlayerModelService;
+import com.stackroute.maverick.service.ReportDataImpl;
 import com.stackroute.maverick.service.UserService;
+import com.stackroute.maverick.service.UserServiceImpl;
 
 @CrossOrigin(value = "*")
 @Controller
 @RequestMapping("/maverick")
 public class MultiPlayerFFFGame {
-
+	int questionCounter = 0;
 	int counter = 0;
 	int responses = 0;
 	MultiPlayerModel multiPlayerGameQuestion;
 	MatchingData matchingData;
 	List<MultipleQuestions> quest;
 	List<MultipleQuestions> question;
-	MultipleQuestions q;
+	public static MultipleQuestions q;
+	public static MultiPlayerGame d;
+	public static MultiPlayerModel setQuestions;
 
 	// @Autowired
 	Users users = new Users();
@@ -76,6 +83,9 @@ public class MultiPlayerFFFGame {
 	String url;
 
 	@Autowired
+	ReportDataImpl reportDataImpl;
+
+	@Autowired
 	private RestTemplate restTemplate;
 
 	@Autowired
@@ -99,6 +109,12 @@ public class MultiPlayerFFFGame {
 	@Autowired
 	MultiPlayerModelRepository multiPlayerModelRepository;
 
+	@Autowired
+	UserServiceImpl userServiceImpl;
+
+	@Autowired
+	KafkaProducer kafkaProducer;
+
 	@Bean
 	public MultipleQuestions multipleQuestions() {
 		return new MultipleQuestions();
@@ -118,13 +134,20 @@ public class MultiPlayerFFFGame {
 		responseData.setSelectedOption(data.fromJson(message, Map.class).get("selectedOption").toString());
 		responseData.setQuestionStamp(data.fromJson(message, Map.class).get("questionStamp").toString());
 		responseData.setCorrectAns(data.fromJson(message, Map.class).get("correctAns").toString());
-
 		responseData.setEndTime(endTime);
 		responseData.setUserId(userId);
 		responseData.setQuestionId(qId);
+		ReportingData reportData = reportDataImpl.setQuestionData(responseData);
+		GameDetails gameDetails = new GameDetails();
+		gameDetails.setGameId(setQuestions.getGameId());
+		gameDetails.setGameName(setQuestions.getGameName());
+		gameDetails.setGameSessionId(setQuestions.getGameSessionId());
+		reportData.setGameDetails(gameDetails);
+		reportDataImpl.saveReportingData(reportData);
+
 		System.out.println(responses);
 		result = multiPlayerAssessmentImpl.MultiPlayerFastestFingerFirstAssessment(responseData);
-		if (result.equals(null)) {
+		if (result.getUserId() == 0) {
 
 			return null;
 		} else {
@@ -150,12 +173,15 @@ public class MultiPlayerFFFGame {
 	// @Scheduled(fixedRate = 10000)
 	public MultipleQuestions sendQuestionToAll(@Payload String message) throws Exception {
 		counter++;
+		questionCounter++;
 		if (counter < 2) {
 			return null;
 		}
 		question = sendQuestion();
 		System.out.println("CorrectAns :" + question.iterator().next().correctAnswer);
+		if(questionCounter < 20) {
 		q = question.get(i);
+
 		if (i < question.size()) {
 			i++;
 		} else {
@@ -163,6 +189,10 @@ public class MultiPlayerFFFGame {
 		}
 		counter = 0;
 		return q;
+		}
+		
+		return null;
+		
 	}
 
 	public void assessment() {
@@ -231,21 +261,22 @@ public class MultiPlayerFFFGame {
 	}
 
 	@GetMapping("/getQuestionsFromGameManager")
-	public MultiPlayerGame getQuestionsFromGameManager() {
+	public ResponseEntity<MultiPlayerGame> getQuestionsFromGameManager() {
 
 		System.out.println("Method hit");
-		MultiPlayerGame d = restTemplate.getForObject(url, MultiPlayerGame.class);
-		multiPlayerModelService.create(d);
+		d = restTemplate.getForObject(url, MultiPlayerGame.class);
+		setQuestions = multiPlayerModelService.create(d);
 		System.out.println("Save");
-		return d;
+		return new ResponseEntity<MultiPlayerGame>(d, HttpStatus.OK);
 	}
 
-	@GetMapping("/getResults/{userId1}/{userId2}")
-	public Users getResult(@PathVariable("userId1") int userId1 , @PathVariable("userId2") int userId2) {
-		multiPlayerModelService.getResults(userId1, userId2);
+	@GetMapping("/getResults")
+	public ResponseEntity<Users> getResult() {
+		Users user = userServiceImpl.getResults();
+
 		System.out.println("Result method hit");
-		
-return null;
+		kafkaProducer.send("result.t", user);
+		return new ResponseEntity<Users>(user, HttpStatus.OK);
 	}
 
 }

@@ -5,7 +5,8 @@ public class GameQuestionLevel {
 	private int easyLevel;
     private int mediumLevel;
     private int advancedLevel;
-	public int getEasyLevel() {
+	
+    public int getEasyLevel() {
 		return easyLevel;
 	}
 	public void setEasyLevel(int easyLevel) {

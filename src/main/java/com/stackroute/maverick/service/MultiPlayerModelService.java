@@ -17,6 +17,6 @@ public interface MultiPlayerModelService {
 	public Iterable<MultiPlayerModel> getAllQuestions();
 
 	MultiPlayerModel update(MultiPlayerModel updateMultiPlayer);
+
 	
-	public Users getResults(int userId1 , int userId2);
 }

@@ -4,7 +4,8 @@ public class GameType {
 	private int gameTypeId;
     private String gameTypeName;
     private String gameTypeDescription;
-	public int getGameTypeId() {
+	
+    public int getGameTypeId() {
 		return gameTypeId;
 	}
 	public void setGameTypeId(int gameTypeId) {

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class MultiPlayerGame {
 
-	 private int gameId;
+	    private int gameId;
 	    private String gameName;
 	    private String gameImage;
 	    private String createdBy;

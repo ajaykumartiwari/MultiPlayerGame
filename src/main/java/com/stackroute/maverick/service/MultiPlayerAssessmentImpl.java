@@ -21,7 +21,7 @@ public class MultiPlayerAssessmentImpl {
 
 	public MultiPlayerGameResponseData MultiPlayerFastestFingerFirstAssessment(
 			MultiPlayerGameResponseData responseData) {
-
+		MultiPlayerGameResponseData defaultUser = new MultiPlayerGameResponseData(); 
 		int userId = responseData.getUserId();
 		System.out.println("User id" + userId);
 		String userOption = responseData.getSelectedOption();
@@ -55,7 +55,7 @@ public class MultiPlayerAssessmentImpl {
 
 		}
 		counter++;
-		return null;
+		return defaultUser;
 
 	}
 

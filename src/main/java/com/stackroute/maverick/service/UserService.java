@@ -16,5 +16,7 @@ public interface UserService {
 	Users findByUserId(int userId);
 
 	public Iterable<Users> getAllUsers();
+	
+	public Users getResults();
 
 }
