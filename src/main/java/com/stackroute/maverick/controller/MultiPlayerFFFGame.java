@@ -190,7 +190,7 @@ public class MultiPlayerFFFGame {
 		counter = 0;
 		return q;
 		}
-		
+		questionCounter = 0;
 		return null;
 		
 	}
