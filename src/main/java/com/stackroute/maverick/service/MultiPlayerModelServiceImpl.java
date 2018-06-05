@@ -64,7 +64,8 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 		questions = new ArrayList<>();
 
 		multiPlayerModel.setGameId(multiPlayerGame.getGameId());
-		multiPlayerModel.setGameSessionId(multiPlayerModel.getGameSessionId());
+		System.out.println("GameId" + multiPlayerGame.getGameId());
+		multiPlayerModel.setGameSessionId(multiPlayerGame.getGameId());
 		for (int i = 0; i < multiPlayerGame.getAutoquestions().size(); i++) {
 			multipleQuestions = new MultipleQuestions();
 			multipleQuestions.setCorrectAnswer(multiPlayerGame.getAutoquestions().get(i).getCorrectAnswer());

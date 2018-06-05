@@ -12,19 +12,23 @@ import com.stackroute.maverick.domain.MultiPlayerGameResponseData;
 import com.stackroute.maverick.domain.ReportQuestions;
 import com.stackroute.maverick.domain.ReportingData;
 import com.stackroute.maverick.repository.ReportDataRepository;
+import com.stackroute.maverick.repository.UsersRepository;
+
 @Service
 public class ReportDataImpl implements ReportData {
 
-	
 	@Bean
-	public ReportingData reportingData()
-	{
+	public ReportingData reportingData() {
 		return new ReportingData();
 	}
+	
+	
+
 	@Autowired
 	ReportingData reportingData;
 
 	public static int counter = 0;
+	public static int questionCounter = 0;
 
 	@Autowired
 	ReportDataRepository reportDataRepository;
@@ -37,28 +41,31 @@ public class ReportDataImpl implements ReportData {
 	 */
 	@Override
 	public ReportingData setQuestionData(MultiPlayerGameResponseData responseData) {
-		counter++;
 
+		questionCounter++;
 		ReportQuestions reportQuestions = new ReportQuestions();
 		GameDetails gameDetails = new GameDetails();
-
-		String[] options = responseData.getOptions();
-		for (int i = 0; i < options.length; i++) {
-			if (i == 0)
-				reportQuestions.setOption1(options[i]);
-			else if (i == 1)
-				reportQuestions.setOption2(options[i]);
-			else if (i == 2)
-				reportQuestions.setOption3(options[i]);
-			else
-				reportQuestions.setOption4(options[i]);
-		}
-		reportQuestions.setCorrectAnswer(responseData.getCorrectAns());
-		reportQuestions.setQuestionId(responseData.getQuestionId());
-		reportQuestions.setQuestionName(responseData.getQuestionStamp());
-		reportQuestions.setSelectedAnswer(responseData.getSelectedOption());
-		gameDetails.setGameTypeName(gameDetails.getGameName());
-		reportQuestionsList.add(reportQuestions);
+		//
+		// String[] options = responseData.getOptions();
+		// for (int i = 0; i < 4; i++) {
+		// if (i == 0)
+		// reportQuestions.setOption1(options[i]);
+		// else if (i == 1)
+		// reportQuestions.setOption2(options[i]);
+		// else if (i == 2)
+		// reportQuestions.setOption3(options[i]);
+		// else
+		// reportQuestions.setOption4(options[i]);
+		// }
+		
+			reportQuestions.setCorrectAnswer(responseData.getCorrectAns());
+			reportQuestions.setQuestionId(responseData.getQuestionId());
+			reportQuestions.setQuestionName(responseData.getQuestionStamp());
+			reportQuestions.setSelectedAnswer(responseData.getSelectedOption());
+			gameDetails.setGameTypeName(gameDetails.getGameName());
+			reportQuestionsList.add(reportQuestions);
+			
+		
 		reportingData.setReportQuestions(reportQuestionsList);
 		reportingData.setUserId(responseData.getUserId());
 		reportDataRepository.save(reportingData);

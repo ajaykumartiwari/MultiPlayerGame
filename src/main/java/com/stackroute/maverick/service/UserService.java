@@ -17,6 +17,5 @@ public interface UserService {
 
 	public Iterable<Users> getAllUsers();
 	
-	public Users getResults();
-
+	
 }

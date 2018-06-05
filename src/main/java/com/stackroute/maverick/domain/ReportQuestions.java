@@ -1,7 +1,10 @@
 package com.stackroute.maverick.domain;
 
+import org.springframework.data.annotation.Id;
+
 public class ReportQuestions {
 
+	@Id
 	private int questionId;
 	private String questionName;
 	private String correctAnswer;

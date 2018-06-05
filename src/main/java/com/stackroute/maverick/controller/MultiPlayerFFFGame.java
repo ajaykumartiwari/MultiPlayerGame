@@ -38,6 +38,7 @@ import com.stackroute.maverick.service.KafkaProducer;
 import com.stackroute.maverick.service.MultiPlayerAssessmentImpl;
 import com.stackroute.maverick.service.MultiPlayerModelService;
 import com.stackroute.maverick.service.ReportDataImpl;
+import com.stackroute.maverick.service.Results;
 import com.stackroute.maverick.service.UserService;
 import com.stackroute.maverick.service.UserServiceImpl;
 
@@ -47,6 +48,7 @@ import com.stackroute.maverick.service.UserServiceImpl;
 public class MultiPlayerFFFGame {
 	int questionCounter = 0;
 	int counter = 0;
+	int saveCounter = 0;
 	int responses = 0;
 	MultiPlayerModel multiPlayerGameQuestion;
 	MatchingData matchingData;
@@ -55,9 +57,14 @@ public class MultiPlayerFFFGame {
 	public static MultipleQuestions q;
 	public static MultiPlayerGame d;
 	public static MultiPlayerModel setQuestions;
+	@Autowired
+	Users user;
 
 	// @Autowired
 	Users users = new Users();
+
+	@Autowired
+	Results results;
 
 	int i = 0;
 	String message;
@@ -124,11 +131,15 @@ public class MultiPlayerFFFGame {
 	@SendTo("/topicResponse/reply")
 	public String storeResponse(@Payload String message) throws Exception {
 		responses++;
+		saveCounter++;
 		Gson data = new Gson();
 		MultiPlayerGameResponseData result;
 
 		System.out.println("Private topic" + message);
 		int userId = Integer.parseInt((data.fromJson(message, Map.class).get("userId").toString()));
+
+		System.out.println("User Id " + userId);
+
 		int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
 		int qId = Integer.parseInt(data.fromJson(message, Map.class).get("questionId").toString());
 		responseData.setSelectedOption(data.fromJson(message, Map.class).get("selectedOption").toString());
@@ -137,13 +148,16 @@ public class MultiPlayerFFFGame {
 		responseData.setEndTime(endTime);
 		responseData.setUserId(userId);
 		responseData.setQuestionId(qId);
+
 		ReportingData reportData = reportDataImpl.setQuestionData(responseData);
 		GameDetails gameDetails = new GameDetails();
+
 		gameDetails.setGameId(setQuestions.getGameId());
 		gameDetails.setGameName(setQuestions.getGameName());
 		gameDetails.setGameSessionId(setQuestions.getGameSessionId());
 		reportData.setGameDetails(gameDetails);
 		reportDataImpl.saveReportingData(reportData);
+		saveCounter = 0;
 
 		System.out.println(responses);
 		result = multiPlayerAssessmentImpl.MultiPlayerFastestFingerFirstAssessment(responseData);
@@ -168,20 +182,43 @@ public class MultiPlayerFFFGame {
 		}
 	}
 
+//	@MessageMapping("/messageOpen")
+//	@SendTo("/topicQuestion/reply")
+//	// @Scheduled(fixedRate = 10000)
+//	public MultipleQuestions sendQuestionToAll(@Payload String message) throws Exception {
+//		counter++;
+//		questionCounter++;
+//
+//		if (counter < 2) {
+//			return null;
+//		}
+//
+//		question = sendQuestion();
+//		System.out.println("CorrectAns :" + question.iterator().next().correctAnswer);
+//
+//		q = question.get(i);
+//
+//		if (i < question.size()) {
+//			i++;
+//		} else {
+//			i = 0;
+//		}
+//		counter--;
+//		return q;
+//
+//	}
 	@MessageMapping("/messageOpen")
 	@SendTo("/topicQuestion/reply")
 	// @Scheduled(fixedRate = 10000)
 	public MultipleQuestions sendQuestionToAll(@Payload String message) throws Exception {
 		counter++;
-		questionCounter++;
+		
 		if (counter < 2) {
 			return null;
 		}
 		question = sendQuestion();
 		System.out.println("CorrectAns :" + question.iterator().next().correctAnswer);
-		if(questionCounter < 20) {
 		q = question.get(i);
-
 		if (i < question.size()) {
 			i++;
 		} else {
@@ -189,10 +226,6 @@ public class MultiPlayerFFFGame {
 		}
 		counter = 0;
 		return q;
-		}
-		questionCounter = 0;
-		return null;
-		
 	}
 
 	public void assessment() {
@@ -257,7 +290,7 @@ public class MultiPlayerFFFGame {
 		for (int i = 0; i < quest.size(); i++) {
 			System.out.println("Data is ====> :" + quest.get(i).questionStamp);
 		}
-		return quest;
+	return quest;
 	}
 
 	@GetMapping("/getQuestionsFromGameManager")
@@ -271,11 +304,18 @@ public class MultiPlayerFFFGame {
 	}
 
 	@GetMapping("/getResults")
-	public ResponseEntity<Users> getResult() {
-		Users user = userServiceImpl.getResults();
+ public ResponseEntity<Users> getResult() {
+
+		System.out.println("Method has been hit");
+//Users dummyUser = new Users();
+//dummyUser.setScore(0);
+//dummyUser.setGameId(0);
+user = results.getResults();
+
+		System.out.println("After sending");
 
 		System.out.println("Result method hit");
-		kafkaProducer.send("result.t", user);
+
 		return new ResponseEntity<Users>(user, HttpStatus.OK);
 	}
 
