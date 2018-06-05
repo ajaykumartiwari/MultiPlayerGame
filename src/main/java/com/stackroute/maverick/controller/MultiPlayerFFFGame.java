@@ -140,7 +140,7 @@ public class MultiPlayerFFFGame {
 
 		System.out.println("User Id " + userId);
 
-		int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
+	 int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
 		int qId = Integer.parseInt(data.fromJson(message, Map.class).get("questionId").toString());
 		responseData.setSelectedOption(data.fromJson(message, Map.class).get("selectedOption").toString());
 		responseData.setQuestionStamp(data.fromJson(message, Map.class).get("questionStamp").toString());
@@ -212,6 +212,10 @@ public class MultiPlayerFFFGame {
 	// @Scheduled(fixedRate = 10000)
 	public MultipleQuestions sendQuestionToAll(@Payload String message) throws Exception {
 		counter++;
+		System.out.println("Method hit");
+		d = restTemplate.getForObject(url, MultiPlayerGame.class);
+		setQuestions = multiPlayerModelService.create(d);
+		System.out.println("Save");
 		
 		if (counter < 2) {
 			return null;
