@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +48,7 @@ import com.stackroute.maverick.service.UserServiceImpl;
 @Controller
 @RequestMapping("/maverick")
 public class MultiPlayerFFFGame {
+	int resultsCounter = 0;
 	int questionCounter = 0;
 	int counter = 0;
 	int saveCounter = 0;
@@ -59,6 +62,8 @@ public class MultiPlayerFFFGame {
 	public static MultiPlayerModel setQuestions;
 	@Autowired
 	Users user;
+
+	public static Timer timer = new Timer();
 
 	// @Autowired
 	Users users = new Users();
@@ -127,20 +132,32 @@ public class MultiPlayerFFFGame {
 		return new MultipleQuestions();
 	}
 
+	/**
+	 * 
+	 * Socket connection. Assessment method is called here , and real time scoring
+	 * is done. Real-time data is also stored according to user answers in this
+	 * method
+	 * 
+	 * @param message
+	 * @return
+	 * @throws Exception
+	 */
 	@MessageMapping("/privateMessage")
 	@SendTo("/topicResponse/reply")
 	public String storeResponse(@Payload String message) throws Exception {
-		responses++;
-		saveCounter++;
+
 		Gson data = new Gson();
 		MultiPlayerGameResponseData result;
 
 		System.out.println("Private topic" + message);
+		
+
+	
+
+		//Data received as string form , parsed and put into variables
+		//Setting into the domain.
 		int userId = Integer.parseInt((data.fromJson(message, Map.class).get("userId").toString()));
-
-		System.out.println("User Id " + userId);
-
-	 int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
+		int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
 		int qId = Integer.parseInt(data.fromJson(message, Map.class).get("questionId").toString());
 		responseData.setSelectedOption(data.fromJson(message, Map.class).get("selectedOption").toString());
 		responseData.setQuestionStamp(data.fromJson(message, Map.class).get("questionStamp").toString());
@@ -159,7 +176,6 @@ public class MultiPlayerFFFGame {
 		reportDataImpl.saveReportingData(reportData);
 		saveCounter = 0;
 
-		System.out.println(responses);
 		result = multiPlayerAssessmentImpl.MultiPlayerFastestFingerFirstAssessment(responseData);
 		if (result.getUserId() == 0) {
 
@@ -182,31 +198,33 @@ public class MultiPlayerFFFGame {
 		}
 	}
 
-//	@MessageMapping("/messageOpen")
-//	@SendTo("/topicQuestion/reply")
-//	// @Scheduled(fixedRate = 10000)
-//	public MultipleQuestions sendQuestionToAll(@Payload String message) throws Exception {
-//		counter++;
-//		questionCounter++;
-//
-//		if (counter < 2) {
-//			return null;
-//		}
-//
-//		question = sendQuestion();
-//		System.out.println("CorrectAns :" + question.iterator().next().correctAnswer);
-//
-//		q = question.get(i);
-//
-//		if (i < question.size()) {
-//			i++;
-//		} else {
-//			i = 0;
-//		}
-//		counter--;
-//		return q;
-//
-//	}
+	// @MessageMapping("/messageOpen")
+	// @SendTo("/topicQuestion/reply")
+	// // @Scheduled(fixedRate = 10000)
+	// public MultipleQuestions sendQuestionToAll(@Payload String message) throws
+	// Exception {
+	// counter++;
+	// questionCounter++;
+	//
+	// if (counter < 2) {
+	// return null;
+	// }
+	//
+	// question = sendQuestion();
+	// System.out.println("CorrectAns :" +
+	// question.iterator().next().correctAnswer);
+	//
+	// q = question.get(i);
+	//
+	// if (i < question.size()) {
+	// i++;
+	// } else {
+	// i = 0;
+	// }
+	// counter--;
+	// return q;
+	//
+	// }
 	@MessageMapping("/messageOpen")
 	@SendTo("/topicQuestion/reply")
 	// @Scheduled(fixedRate = 10000)
@@ -216,7 +234,7 @@ public class MultiPlayerFFFGame {
 		d = restTemplate.getForObject(url, MultiPlayerGame.class);
 		setQuestions = multiPlayerModelService.create(d);
 		System.out.println("Save");
-		
+
 		if (counter < 2) {
 			return null;
 		}
@@ -294,7 +312,7 @@ public class MultiPlayerFFFGame {
 		for (int i = 0; i < quest.size(); i++) {
 			System.out.println("Data is ====> :" + quest.get(i).questionStamp);
 		}
-	return quest;
+		return quest;
 	}
 
 	@GetMapping("/getQuestionsFromGameManager")
@@ -308,19 +326,45 @@ public class MultiPlayerFFFGame {
 	}
 
 	@GetMapping("/getResults")
- public ResponseEntity<Users> getResult() {
-
+	public ResponseEntity<Users> getResult() {
+		resultsCounter++;
 		System.out.println("Method has been hit");
-//Users dummyUser = new Users();
-//dummyUser.setScore(0);
-//dummyUser.setGameId(0);
-        user = results.getResults();
+		// Users dummyUser = new Users();
+		// dummyUser.setScore(0);
+		// dummyUser.setGameId(0);
+		if (resultsCounter == 1) {
+			user = results.getResults();
+			resultsCounter = -1;
+		}
 
 		System.out.println("After sending");
 
 		System.out.println("Result method hit");
-
+		timer = new Timer();
+		timer.schedule(new RemindTask(), 2000);
 		return new ResponseEntity<Users>(user, HttpStatus.OK);
+	}
+
+	class RemindTask extends TimerTask {
+
+		/**
+		 * Method to send the list, once the given time is up.
+		 * 
+		 * @author shatayki
+		 *
+		 */
+		public void run() {
+
+			Iterable<Users> allUsers = userServiceImpl.getAllUsers();
+			for (Users user : allUsers) {
+				user.setScore(0);
+				userServiceImpl.saveUsers(user);
+
+			}
+			resultsCounter = 0;
+			System.out.println("Scores set to zero");
+		}
+
 	}
 
 }

@@ -67,9 +67,11 @@ public class Results {
 				ReportingData saveUser = new ReportingData();
 				ReportingData reportData = oneUser.get();
 				saveUser.setScore(score);
+				
 				saveUser.setGameDetails(reportData.getGameDetails());
 				saveUser.setReportQuestions(reportData.getReportQuestions());
 				saveUser.setUserId(reportData.getUserId());
+				kafkaProducer.sendReportingData("reportingtopic.t", saveUser);
 				System.out.println("looser" + saveUser.getScore());
 				winningUser1.setScore(score);
 
@@ -90,10 +92,12 @@ public class Results {
 					System.out.println("Data sent");
 
 				}
+				
+				
 
 			}
 
-			counter = -1;
+			counter = 0;
 		}
 
      return winningUser1;

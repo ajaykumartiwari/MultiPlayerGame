@@ -3,10 +3,7 @@
  */
 package com.stackroute.maverick.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.stackroute.maverick.domain.ReportingData;
@@ -43,6 +40,14 @@ public class UserServiceImpl implements UserService {
 	public UserServiceImpl(UsersRepository usersRepo) {
 		super();
 		this.usersRepo = usersRepo;
+	}
+	
+	
+	public Users saveUsers(Users users) {
+		// TODO Auto-generated method stub
+		users = usersRepo.save(users);
+
+		return users;
 	}
 
 	@Override
