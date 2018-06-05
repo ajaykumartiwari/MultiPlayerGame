@@ -13,6 +13,8 @@ import com.stackroute.maverick.repository.UsersRepository;
 
 @Service
 public class Results {
+	
+	int starttingScore = 0;
 	@Autowired
 	UsersRepository usersRepo;
 
@@ -27,7 +29,7 @@ public class Results {
 	}
 
 	@Autowired
-	Users winningUser;
+	Users winningUser1;
 
 	@Autowired
 	KafkaProducer kafkaProducer;
@@ -46,6 +48,7 @@ public class Results {
 	@Autowired
 	public Results(ReportDataRepository reportDataRepository) {
 		super();
+		
 		this.reportDataRepository = reportDataRepository;
 	}
 
@@ -63,24 +66,26 @@ public class Results {
 				System.out.println("User id after query" + oneUser.isPresent());
 				ReportingData saveUser = new ReportingData();
 				ReportingData reportData = oneUser.get();
-				saveUser.setScore(reportData.getScore());
+				saveUser.setScore(score);
 				saveUser.setGameDetails(reportData.getGameDetails());
 				saveUser.setReportQuestions(reportData.getReportQuestions());
 				saveUser.setUserId(reportData.getUserId());
-				//reportDataImpl.scoreUpdate(saveUser);
-				winningUser.setScore(0);
-				if (winningUser.getScore() <= score) {
+				System.out.println("looser" + saveUser.getScore());
+				winningUser1.setScore(score);
 
-					winningUser.setScore(user.getScore());
-					winningUser.setGameId(user.getGameId());
-					winningUser.setUserId(user.getUserId());
-					Optional<ReportingData> winnerUser = reportDataRepository.findById(winningUser.getUserId());
+				if (winningUser1.getScore() <= starttingScore) {
+                    starttingScore = user.getScore();
+					winningUser1.setScore(user.getScore());
+					winningUser1.setGameId(user.getGameId());
+					winningUser1.setUserId(user.getUserId());
+					Optional<ReportingData> winnerUser = reportDataRepository.findById(winningUser1.getUserId());
 					ReportingData saveWinningUser = winnerUser.get();
 					ReportingData winner = new ReportingData();
-					saveWinningUser.setScore(winner.getScore());
+					saveWinningUser.setScore(winningUser1.getScore());
 					saveWinningUser.setGameDetails(winner.getGameDetails());
 					saveWinningUser.setReportQuestions(winner.getReportQuestions());
 					saveWinningUser.setUserId(winner.getUserId());
+					System.out.println(saveWinningUser.getScore() + " Winner");
 					//reportDataImpl.scoreUpdate(saveWinningUser);
 					System.out.println("Data sent");
 
@@ -91,7 +96,7 @@ public class Results {
 			counter = -1;
 		}
 
-		return winningUser;
+     return winningUser1;
 
 	}
 }

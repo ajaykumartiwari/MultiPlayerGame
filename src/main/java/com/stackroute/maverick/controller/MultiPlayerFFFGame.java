@@ -310,7 +310,7 @@ public class MultiPlayerFFFGame {
 //Users dummyUser = new Users();
 //dummyUser.setScore(0);
 //dummyUser.setGameId(0);
-user = results.getResults();
+        user = results.getResults();
 
 		System.out.println("After sending");
 
