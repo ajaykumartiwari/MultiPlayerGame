@@ -3,7 +3,7 @@ package com.stackroute.maverick.domain;
 public class GameDetails {
 
 	private int gameId;
-	private String gameName;
+    private String gameName;
 	private String gameTypeName;
 	private int gameSessionId;
 

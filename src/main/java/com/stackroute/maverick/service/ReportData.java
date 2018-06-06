@@ -10,5 +10,7 @@ public interface ReportData {
 
 	public void saveReportingData(ReportingData reportingData);
 	
+ public void deleteData();
+	
 	
 }

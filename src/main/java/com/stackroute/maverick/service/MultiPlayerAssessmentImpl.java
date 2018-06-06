@@ -13,22 +13,23 @@ public class MultiPlayerAssessmentImpl {
 	int endTime = 0;
 
 	@Autowired
-	private UsersRepository usersRepository;
+	UsersRepository usersRepository;
 
-	@Autowired
-	MultiPlayerGameResponseData winningUser;
+	
+	MultiPlayerGameResponseData responseData = new MultiPlayerGameResponseData();
+	
 	int counter = 1;
 
 	public MultiPlayerGameResponseData MultiPlayerFastestFingerFirstAssessment(
-			MultiPlayerGameResponseData responseData) {
+			MultiPlayerGameResponseData data) {
 		MultiPlayerGameResponseData defaultUser = new MultiPlayerGameResponseData(); 
-		int userId = responseData.getUserId();
+		int userId = data.getUserId();
 		System.out.println("User id" + userId);
-		String userOption = responseData.getSelectedOption();
+		String userOption = data.getSelectedOption();
 		System.out.println("UserOption" + userOption);
-		String correctionOption = responseData.getCorrectAns();
-		int finishTime = responseData.getEndTime();
-		responseData.getQuestionId();
+		String correctionOption = data.getCorrectAns();
+		int finishTime = data.getEndTime();
+		data.getQuestionId();
 		System.out.println("Correct answers and selected option " + correctionOption + userOption);
 
 		if (userOption.equals(correctionOption)) {
@@ -39,19 +40,19 @@ public class MultiPlayerAssessmentImpl {
 				System.out.println("Inside second");
 				this.endTime = finishTime;
 				System.out.println("EndTime" + endTime);
-				winningUser.setUserId(userId);
+				responseData.setUserId(userId);
 			}
 
 		} else {
-			Users user = usersRepository.findByuserId(responseData.getUserId());
+			Users user = usersRepository.findByuserId(data.getUserId());
 			user.setScore(user.getScore() - 5);
 			usersRepository.save(user);
 		}
-		System.out.println("In assess" + winningUser.getUserId());
+		System.out.println("In assess" + responseData.getUserId());
 
 		if (counter == 2) {
 			counter--;
-			return winningUser;
+			return responseData;
 
 		}
 		counter++;

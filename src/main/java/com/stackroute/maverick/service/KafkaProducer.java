@@ -27,7 +27,7 @@ public class KafkaProducer {
 	
 	public void sendReportingData(String topic, ReportingData payload) {
 
-		log.info("sending data='{}'", payload);
+		log.info("sending data='{}'", payload.getGameDetails().getGameName());
 		kafkaTemplateReportingData.send(topic, payload);
 	}
 

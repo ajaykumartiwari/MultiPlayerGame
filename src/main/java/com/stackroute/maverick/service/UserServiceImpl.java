@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	ReportDataRepository reportDataRepository;
 
-	@Autowired
-	ReportingData reportingData;
+	 
+	ReportingData reportingData = new ReportingData();
 
 	@Autowired
 	ReportDataImpl reportDataImpl;

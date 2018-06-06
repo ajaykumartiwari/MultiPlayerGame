@@ -74,21 +74,25 @@ public class MultiPlayerFFFGame {
 	int i = 0;
 	String message;
 
-	@Autowired
-	MultiPlayerGameResponseData responseData;
+	@Bean
+	public MultipleQuestions multipleQuestions() {
+		return new MultipleQuestions();
+	}
 
 	@Bean
 	public MultiPlayerGameResponseData responseData() {
 		return new MultiPlayerGameResponseData();
 	}
 
-	@Bean
-	public MultiPlayerModel multiPlayerModel() {
-		return new MultiPlayerModel();
-	}
+	// @Bean
+	// public ReportingData reportingData() {
+	// return new ReportingData();
+	// }
+
+	MultiPlayerModel multiPlayerModel = new MultiPlayerModel();
 
 	@Autowired
-	MultiPlayerModel multiPlayerModel;
+	MultiPlayerGameResponseData responseData;
 
 	Set<Users> set = new HashSet<>();
 	@Value("${spring.data.rest.base-path}")
@@ -127,11 +131,6 @@ public class MultiPlayerFFFGame {
 	@Autowired
 	KafkaProducer kafkaProducer;
 
-	@Bean
-	public MultipleQuestions multipleQuestions() {
-		return new MultipleQuestions();
-	}
-
 	/**
 	 * 
 	 * Socket connection. Assessment method is called here , and real time scoring
@@ -150,12 +149,9 @@ public class MultiPlayerFFFGame {
 		MultiPlayerGameResponseData result;
 
 		System.out.println("Private topic" + message);
-		
 
-	
-
-		//Data received as string form , parsed and put into variables
-		//Setting into the domain.
+		// Data received as string form , parsed and put into variables
+		// Setting into the domain.
 		int userId = Integer.parseInt((data.fromJson(message, Map.class).get("userId").toString()));
 		int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
 		int qId = Integer.parseInt(data.fromJson(message, Map.class).get("questionId").toString());
@@ -172,6 +168,7 @@ public class MultiPlayerFFFGame {
 		gameDetails.setGameId(setQuestions.getGameId());
 		gameDetails.setGameName(setQuestions.getGameName());
 		gameDetails.setGameSessionId(setQuestions.getGameSessionId());
+		System.out.println("GameName" + gameDetails.getGameName());
 		reportData.setGameDetails(gameDetails);
 		reportDataImpl.saveReportingData(reportData);
 		saveCounter = 0;
@@ -315,15 +312,15 @@ public class MultiPlayerFFFGame {
 		return quest;
 	}
 
-	@GetMapping("/getQuestionsFromGameManager")
-	public ResponseEntity<MultiPlayerGame> getQuestionsFromGameManager() {
-
-		System.out.println("Method hit");
-		d = restTemplate.getForObject(url, MultiPlayerGame.class);
-		setQuestions = multiPlayerModelService.create(d);
-		System.out.println("Save");
-		return new ResponseEntity<MultiPlayerGame>(d, HttpStatus.OK);
-	}
+	// @GetMapping("/getQuestionsFromGameManager")
+	// public ResponseEntity<MultiPlayerGame> getQuestionsFromGameManager() {
+	//
+	// System.out.println("Method hit");
+	// d = restTemplate.getForObject(url, MultiPlayerGame.class);
+	// setQuestions = multiPlayerModelService.create(d);
+	// System.out.println("Save");
+	// return new ResponseEntity<MultiPlayerGame>(d, HttpStatus.OK);
+	// }
 
 	@GetMapping("/getResults")
 	public ResponseEntity<Users> getResult() {
@@ -341,7 +338,7 @@ public class MultiPlayerFFFGame {
 
 		System.out.println("Result method hit");
 		timer = new Timer();
-		timer.schedule(new RemindTask(), 2000);
+		timer.schedule(new RemindTask(), 10000);
 		return new ResponseEntity<Users>(user, HttpStatus.OK);
 	}
 
@@ -359,6 +356,8 @@ public class MultiPlayerFFFGame {
 			for (Users user : allUsers) {
 				user.setScore(0);
 				userServiceImpl.saveUsers(user);
+				reportDataImpl.deleteData();
+				i = 0;
 
 			}
 			resultsCounter = 0;
