@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.stackroute.maverick.domain.MultiPlayerGame;
 import com.stackroute.maverick.domain.MultiPlayerModel;
 import com.stackroute.maverick.domain.MultipleQuestions;
-import com.stackroute.maverick.domain.Users;
 import com.stackroute.maverick.repository.MultiPlayerModelRepository;
 import com.stackroute.maverick.repository.UsersRepository;
 
@@ -36,12 +35,6 @@ public class MultiPlayerModelServiceImpl implements MultiPlayerModelService {
 
 	@Autowired
 	UsersRepository usersRepository;
-
-	// @Override
-	// public Iterable<MultiPlayerModel> getAllQuestions() {
-	// // TODO Auto-generated method stub
-	// return multiPlayerModelRepo.findAll();
-	// }
 
 	@Override
 	public MultiPlayerModel storeQuestion(MultiPlayerModel multiPlayerModel) {

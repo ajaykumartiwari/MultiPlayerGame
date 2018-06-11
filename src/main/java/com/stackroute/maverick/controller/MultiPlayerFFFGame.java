@@ -44,6 +44,11 @@ import com.stackroute.maverick.service.Results;
 import com.stackroute.maverick.service.UserService;
 import com.stackroute.maverick.service.UserServiceImpl;
 
+
+/**
+ * @author ajay
+ *
+ */
 @CrossOrigin(value = "*")
 @Controller
 @RequestMapping("/maverick")
@@ -152,6 +157,7 @@ public class MultiPlayerFFFGame {
 
 		// Data received as string form , parsed and put into variables
 		// Setting into the domain.
+		
 		int userId = Integer.parseInt((data.fromJson(message, Map.class).get("userId").toString()));
 		int endTime = Integer.parseInt((String) (data.fromJson(message, Map.class).get("endTime")));
 		int qId = Integer.parseInt(data.fromJson(message, Map.class).get("questionId").toString());
@@ -222,6 +228,22 @@ public class MultiPlayerFFFGame {
 	// return q;
 	//
 	// }
+	
+	
+	
+	
+	/**
+	 * Getting questions from game manager. 
+	 * Storing in mongodb.
+	 * populate questions on the screen.
+	 * 
+	 * 
+	 * @param message
+	 * @return
+	 * @throws Exception
+	 */
+	
+	
 	@MessageMapping("/messageOpen")
 	@SendTo("/topicQuestion/reply")
 	// @Scheduled(fixedRate = 10000)
@@ -247,6 +269,12 @@ public class MultiPlayerFFFGame {
 		return q;
 	}
 
+	/**
+	 * Getting the response data from the users.
+	 * Generate Assessment for the game.
+	 *
+	 */
+	
 	public void assessment() {
 		List<MultiPlayerGameResponseData> response = new ArrayList<>();
 		response.add(responseData);
@@ -262,6 +290,12 @@ public class MultiPlayerFFFGame {
 		// return score;
 	}
 
+	
+	/**
+	 * Getting all matching users with gameId.
+	 * Populating the data on game leader Board. 
+	 */
+	
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	public ResponseEntity<Iterable<Users>> matchingAllUsers(Users users) {
 		System.out.println("Method hit");
@@ -271,6 +305,11 @@ public class MultiPlayerFFFGame {
 
 	}
 
+	/**
+	 * Getting users based on gameId.
+	 *
+	 */
+	
 	@RequestMapping(value = "/users/{gameId}", method = RequestMethod.GET)
 	public ResponseEntity<Users> matchingUsers(@PathVariable("gameId") int gameId) {
 
@@ -292,6 +331,11 @@ public class MultiPlayerFFFGame {
 	// multiPlayerModelService.create(multiPlayerModel);
 	// return new ResponseEntity<MultiPlayerModel>(multiPlayer, HttpStatus.OK);
 	// }
+	
+	/**
+	 * Getting Questions from mongodb based on gameId
+	 *
+	 */
 
 	@RequestMapping(value = "/questions/{gameId}", method = RequestMethod.GET)
 	public ResponseEntity<MultiPlayerModel> findByGameId(@PathVariable("gameId") int gameId) throws Exception {
@@ -322,6 +366,12 @@ public class MultiPlayerFFFGame {
 	// return new ResponseEntity<MultiPlayerGame>(d, HttpStatus.OK);
 	// }
 
+	
+	/**
+	 * Getting updated score from mongo database.
+	 * Generate Final winner report of the game.
+	 *
+	 */
 	@GetMapping("/getResults")
 	public ResponseEntity<Users> getResult() {
 		resultsCounter++;

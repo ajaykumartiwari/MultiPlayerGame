@@ -58,7 +58,7 @@ public class KafkaConsumer {
 	// "#{'${topicOne:annotated1,foo}'.split(',')}")
 
 	/**
-	 * Method to listen the topic helloworld. And print the message.
+	 * Method to listen the topic test.t of game card. And save the data in users table.
 	 * 
 	 * @param payload
 	 */
@@ -81,7 +81,7 @@ public class KafkaConsumer {
 			
 			List<Integer> values = (List<Integer>) payload.values().iterator().next();
 			for (Integer i5 : Id) {
-				int gameId = i5;
+				int gameId = payload.keySet().iterator().next();
 				for (Integer i1 : values) {
 					int userId = i1;
 					user.setGameId(gameId);
